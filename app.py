@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import random
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 st.set_page_config(layout="wide")
 
@@ -33,7 +34,7 @@ with info:
   st.markdown(content['description'].iloc[key]) 
   st.caption("genre : " + content['genre'].iloc[key])
 
-user_review, rating_hist = st.columns([2, 3])
+user_review, rating_hist = st.columns([3, 2])
 
 # Create a data based on specific content
 user_watch_content = combine[combine['content_id'] == content['ID'].iloc[key]]
@@ -42,9 +43,13 @@ user_watch_content = combine[combine['content_id'] == content['ID'].iloc[key]]
 sample = user_watch_content.sample(1)
 
 with user_review:
-  st.title(sample['username'].values[0])
+  st.title("Username : " + sample['username'].values[0])
   st.markdown(sample['comment'].values[0])
 
 with rating_hist:
+  st.title(f"Average rating : {user_watch_content['rating'].mean():.2f}")
+  fig, ax = plt.subplots()
+  sns.set_theme()
   sns.countplot(user_watch_content['rating'])
-  st.pyplot()
+  st.pyplot(fig)
+  
