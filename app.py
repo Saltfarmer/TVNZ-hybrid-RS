@@ -4,6 +4,7 @@ import numpy as np
 import random
 import seaborn as sns
 import matplotlib.pyplot as plt
+import streamlit_authenticator as stauth
 
 st.set_page_config(layout="wide")
 
@@ -53,18 +54,75 @@ with rating_hist:
   sns.countplot(user_watch_content['rating'])
   st.pyplot(fig)
 
-# Showing recommendation according to random same cluster
-recom1 = content[content['k_means'] == content['k_means'].iloc[key]].sample(n=5)
+# #1. retrieve user credentials
+# names = user['username'].tolist()
+# passwords = user['ID'].astype(str).tolist()
 
-st.title("5 Recommendation based on description cluster and random category")
-columns = st.columns(5)
+# #2. create a hash for each passwords so that we do not send these in the clear
+# hashed_passwords = stauth.Hasher(passwords).generate()
 
-def keychanger(keymaker):
-  st.session_state['key'] = keymaker
+# #3. create the authenticator which will create an authentication session cookie with an expiry interval
+# authenticator = stauth.Authenticate(names, names, hashed_passwords, 'streamlit-auth-0','streamlit-auth-0-key',cookie_expiry_days=1)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom1['title'].iloc[i]].index.tolist()[0]
-      st.button(recom1['title'].iloc[i], on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom1['GenreType'].iloc[i])
-      st.image(recom1['image'].iloc[i])
+# #4. display the login form in the sidebar 
+# name, authentication_status, username = authenticator.login('Login','sidebar')
+
+# #5. the streamlit_authenticator library keeps state of the authentication status in streamlit's st.session_state['authentication_status']
+
+# # > if the authentication succeeded (i.e. st.session_state['authentication_status'] == True)
+# if st.session_state['authentication_status']:
+#   # display name on the sidebar
+#   with st.sidebar:
+#     st.text(name)			
+
+#   # set user id in session state
+#   user_id = int(user[user['username'] == name]['ID'].iloc[0])
+#   st.session_state['user'] = user_id
+  
+# # > if the authentication failed
+# elif st.session_state['authentication_status'] == False:
+#   # write an error message on the sidebar
+#   with st.sidebar:
+#     st.error('Username/password is incorrect')
+
+# # > if there are no authentication attempts yet (e.g., first time visitors)
+# elif st.session_state['authentication_status'] == None:
+#   # write an warning message on the sidebar
+#   with st.sidebar:			
+#     st.warning('Please enter your username and password in the sidebar')
+
+# # Showing recommendation according to random same cluster
+# recom1 = content[content['k_means'] == content['k_means'].iloc[key]].sample(n=5)
+
+# st.title("5 Recommendation based on description cluster and random category")
+# columns = st.columns(5)
+
+# def keychanger(keymaker):
+#   st.session_state['key'] = keymaker
+
+# for i in range(5):
+#     with columns[i]:
+#       keymaker = content[content['title'] == recom1['title'].iloc[i]].index.tolist()[0]
+#       st.button(recom1['title'].iloc[i], on_click=keychanger, args=(keymaker, ))
+#       st.markdown(recom1['GenreType'].iloc[i])
+#       st.image(recom1['image'].iloc[i])
+
+# rate = st.slider("Rating ", 1, 5, 3)
+# comment = st.text_input("Your comment", " ")
+
+# def record(data):
+#   st.session_state['activities'].append(data, ignore_index=True)
+#   st.write(len(st.session_state['activities']))
+
+# st.button("Submit", on_click=record, args=(data,))
+
+# st.write(data)
+
+# # st.dataframe(st.session_state['activities'].tail())
+
+st.write("**Add your own comment:**")
+form = st.form("comment")
+rate = form.slider("rate", 1, 5, 3)
+username = form.text_input("Username")
+comment = form.text_area("Comment")
+submit = form.form_submit_button("Add comment")
