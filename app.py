@@ -52,4 +52,19 @@ with rating_hist:
   sns.set_theme()
   sns.countplot(user_watch_content['rating'])
   st.pyplot(fig)
-  
+
+# Showing recommendation according to random same cluster
+recom1 = content[content['k_means'] == content['k_means'].iloc[key]].sample(n=5)
+
+st.title("5 Recommendation based on description cluster and random category")
+columns = st.columns(5)
+
+def keychanger(keymaker):
+  st.session_state['key'] = keymaker
+
+for i in range(5):
+    with columns[i]:
+      keymaker = content[content['title'] == recom1['title'].iloc[i]].index.tolist()[0]
+      st.button(recom1['title'].iloc[i], on_click=keychanger, args=(keymaker, ))
+      st.markdown(recom1['GenreType'].iloc[i])
+      st.image(recom1['image'].iloc[i])
