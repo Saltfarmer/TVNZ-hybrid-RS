@@ -117,14 +117,41 @@ def keychanger(keymaker):
 for i in range(5):
     with columns[i]:
       keymaker = content[content['title'] == recom1['title'].iloc[i]].index.tolist()[0]
-      st.button(recom1['title'].iloc[i], on_click=keychanger, args=(keymaker, ))
+      st.button(recom1['title'].iloc[i], key=1, on_click=keychanger, args=(keymaker, ))
       st.markdown(recom1['GenreType'].iloc[i])
       st.image(recom1['image'].iloc[i])
+
+cat = st.selectbox("Choose the genre", content['GenreType'].unique().tolist(), index=content['GenreType'].unique().tolist().index(content['GenreType'].iloc[key]))
+recom2 = content[(content['k_means'] == content['k_means'].iloc[key]) & (content['GenreType'] == cat)].sample(n=5)
+
+st.title("5 Recommendation based on description cluster and specific category")
+columns = st.columns(5)
+
+for i in range(5):
+    with columns[i]:
+      keymaker = content[content['title'] == recom2['title'].iloc[i]].index.tolist()[0]
+      st.button(recom2['title'].iloc[i], key=2, on_click=keychanger, args=(keymaker, ))
+      st.markdown(recom2['GenreType'].iloc[i])
+      st.image(recom2['image'].iloc[i])
+
+st.title("Top 5 rating content")
+top5 = combine.groupby('content_id').mean().sort_values(by=['rating'], ascending=False).head(5).index
+recom3 = content[content['ID'].isin(top5)]
+
+columns = st.columns(5)
+
+for i in range(5):
+    with columns[i]:
+      keymaker = content[content['title'] == recom3['title'].iloc[i]].index.tolist()[0]
+      st.button(recom3['title'].iloc[i], key=3, on_click=keychanger, args=(keymaker, ))
+      st.markdown(recom3['GenreType'].iloc[i])
+      st.image(recom3['image'].iloc[i])
 
 # Feedback mechanism input part
 
 rate = st.slider("Rating ", 1, 5, 3)
 comment = st.text_input("Your comment", " ", placeholder = "put your comment here and dont forget click enter before submit")
+
 data = {'rating' : rate, 'comment' : comment, 'user_id' : current_user_id, 'content_id' : content['ID'].iloc[key]}
 
 def record(data):
@@ -132,5 +159,5 @@ def record(data):
   
 st.button("Submit", on_click=record, args=(data,))
 
-st.write(data)
-st.dataframe(st.session_state['rating'].tail())
+# st.write(data)
+# st.dataframe(st.session_state['rating'].tail())
