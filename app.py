@@ -142,93 +142,94 @@ top_jac = jac.sort_values(by=['distance'], ascending=False)[1:6].index
 recom0 = content[content['ID'].isin(top_jac)]
 # Showing recommendation according similar title
 
-st.title("5 similar titles")
-columns = st.columns(5)
+with st.expander("See the recommendations"):
+  st.title("5 similar titles")
+  columns = st.columns(5)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom0['title'].iloc[i]].index.tolist()[0]
-      st.button(recom0['title'].iloc[i], key=0, on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom0['category'].iloc[i])
-      st.image(recom0['image'].iloc[i])
+  for i in range(5):
+      with columns[i]:
+        keymaker = content[content['title'] == recom0['title'].iloc[i]].index.tolist()[0]
+        st.button(recom0['title'].iloc[i], key=0, on_click=keychanger, args=(keymaker, ))
+        st.markdown(recom0['category'].iloc[i])
+        st.image(recom0['image'].iloc[i])
 
-# Showing recommendation according to random same cluster
-recom1 = content[content['cluster'] == content['cluster'].iloc[key]].sample(n=5, replace=False)
+  # Showing recommendation according to random same cluster
+  recom1 = content[content['cluster'] == content['cluster'].iloc[key]].sample(n=5, replace=False)
 
-st.title("5 Recommendation based on same description cluster and random category")
-columns = st.columns(5)
+  st.title("5 Recommendation based on same description cluster and random category")
+  columns = st.columns(5)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom1['title'].iloc[i]].index.tolist()[0]
-      st.button(recom1['title'].iloc[i], key=1, on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom1['category'].iloc[i])
-      st.image(recom1['image'].iloc[i])
+  for i in range(5):
+      with columns[i]:
+        keymaker = content[content['title'] == recom1['title'].iloc[i]].index.tolist()[0]
+        st.button(recom1['title'].iloc[i], key=1, on_click=keychanger, args=(keymaker, ))
+        st.markdown(recom1['category'].iloc[i])
+        st.image(recom1['image'].iloc[i])
 
-# Showing recommendation according to random same cluster and category
-cat = st.selectbox("Choose the genre", content['category'].unique().tolist(), index=content['category'].unique().tolist().index(content['category'].iloc[key]))
-recom2 = content[(content['cluster'] == content['cluster'].iloc[key]) & (content['category'] == cat)].sample(n=5, replace=False)
+  # Showing recommendation according to random same cluster and category
+  cat = st.selectbox("Choose the genre", content['category'].unique().tolist(), index=content['category'].unique().tolist().index(content['category'].iloc[key]))
+  recom2 = content[(content['cluster'] == content['cluster'].iloc[key]) & (content['category'] == cat)].sample(n=5, replace=False)
 
-st.title("5 Recommendation based on same description cluster and specific category")
-columns = st.columns(5)
+  st.title("5 Recommendation based on same description cluster and specific category")
+  columns = st.columns(5)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom2['title'].iloc[i]].index.tolist()[0]
-      st.button(recom2['title'].iloc[i], key=2, on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom2['category'].iloc[i])
-      st.image(recom2['image'].iloc[i])
+  for i in range(5):
+      with columns[i]:
+        keymaker = content[content['title'] == recom2['title'].iloc[i]].index.tolist()[0]
+        st.button(recom2['title'].iloc[i], key=2, on_click=keychanger, args=(keymaker, ))
+        st.markdown(recom2['category'].iloc[i])
+        st.image(recom2['image'].iloc[i])
 
-# Showing recommendation according to top 5 rating from user
+  # Showing recommendation according to top 5 rating from user
 
-st.title("Top 5 content based on user rating")
-top5 = combine.groupby('content_id').mean().sort_values(by=['rating'], ascending=False).head(5).index
-recom3 = content[content['ID'].isin(top5)]
+  st.title("Top 5 content based on user rating")
+  top5 = combine.groupby('content_id').mean().sort_values(by=['rating'], ascending=False).head(5).index
+  recom3 = content[content['ID'].isin(top5)]
 
-columns = st.columns(5)
+  columns = st.columns(5)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom3['title'].iloc[i]].index.tolist()[0]
-      st.button(recom3['title'].iloc[i], key=3, on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom3['category'].iloc[i])
-      st.image(recom3['image'].iloc[i])
+  for i in range(5):
+      with columns[i]:
+        keymaker = content[content['title'] == recom3['title'].iloc[i]].index.tolist()[0]
+        st.button(recom3['title'].iloc[i], key=3, on_click=keychanger, args=(keymaker, ))
+        st.markdown(recom3['category'].iloc[i])
+        st.image(recom3['image'].iloc[i])
 
-# Showing recommendation according to similar rating patterns from user
+  # Showing recommendation according to similar rating patterns from user
 
-df = rating.pivot(index='content_id', columns='user_id', values='rating').fillna(0)
+  df = rating.pivot(index='content_id', columns='user_id', values='rating').fillna(0)
 
-from sklearn.neighbors import NearestNeighbors
+  from sklearn.neighbors import NearestNeighbors
 
-knn = NearestNeighbors(metric='cosine', algorithm='brute')
-knn.fit(df.values)
-distances, indices = knn.kneighbors(df.values, n_neighbors=len(df))
+  knn = NearestNeighbors(metric='cosine', algorithm='brute')
+  knn.fit(df.values)
+  distances, indices = knn.kneighbors(df.values, n_neighbors=len(df))
 
-recom4 = content[content['ID'].isin(indices[key][1:])]
+  recom4 = content[content['ID'].isin(indices[key][1:])]
 
-st.title("Top 5 similar content based on user Rating")
+  st.title("Top 5 similar content based on user Rating")
 
-columns = st.columns(5)
+  columns = st.columns(5)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom4['title'].iloc[i]].index.tolist()[0]
-      st.button(recom4['title'].iloc[i], key=4, on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom4['category'].iloc[i])
-      st.image(recom4['image'].iloc[i])
+  for i in range(5):
+      with columns[i]:
+        keymaker = content[content['title'] == recom4['title'].iloc[i]].index.tolist()[0]
+        st.button(recom4['title'].iloc[i], key=4, on_click=keychanger, args=(keymaker, ))
+        st.markdown(recom4['category'].iloc[i])
+        st.image(recom4['image'].iloc[i])
 
-st.title("Top 5 most different content based on user Rating")
+  st.title("Top 5 most different content based on user Rating")
 
-recom5 = content[content['ID'].isin(indices[key][-5:])]
+  recom5 = content[content['ID'].isin(indices[key][-5:])]
 
-columns = st.columns(5)
+  columns = st.columns(5)
 
-for i in range(5):
-    with columns[i]:
-      keymaker = content[content['title'] == recom5['title'].iloc[i]].index.tolist()[0]
-      st.button(recom5['title'].iloc[i], key=5, on_click=keychanger, args=(keymaker, ))
-      st.markdown(recom5['category'].iloc[i])
-      st.image(recom5['image'].iloc[i])
+  for i in range(5):
+      with columns[i]:
+        keymaker = content[content['title'] == recom5['title'].iloc[i]].index.tolist()[0]
+        st.button(recom5['title'].iloc[i], key=5, on_click=keychanger, args=(keymaker, ))
+        st.markdown(recom5['category'].iloc[i])
+        st.image(recom5['image'].iloc[i])
 
 # Feedback mechanism input part
 
