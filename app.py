@@ -16,7 +16,7 @@ user = pd.read_csv('user_data.csv')
 
 # Choosing random default key in state session
 if 'key' not in st.session_state:
-  st.session_state['key'] = random.randint(0, len(content))
+  st.session_state['key'] = random.randint(0, 5271)
 
 key = st.session_state['key']
 
@@ -110,7 +110,7 @@ def authenticate():
       st.warning('Please enter your username and password in the sidebar')
 
 # User login is working but really fucking slow. Uncomment function call below to try use it
-# authenticate()
+authenticate()
 
 def keychanger(keymaker):
   st.session_state['key'] = keymaker
